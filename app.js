@@ -18,6 +18,13 @@ app.listen(port, (req, res) => {
 //   res.send('You can send to this endpoint...');
 // });
 
+// !Required
+// app.get('/api/v1/tours/:id/:x/:y', (req, res) => {})
+// console.log(req.params); // {id: '5', x:'23', y:'45'}
+// !Optional
+// app.get('/api/v1/tours/:id/:x?/:y?', (req, res) => {})
+// console.log(req.params); // {id: '5', x:'23', y:'45'}
+
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
 app.get('/api/v1/tours', (req, res) => {
@@ -30,21 +37,13 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
-// !Required
-// app.get('/api/v1/tours/:id/:x/:y', (req, res) => {})
-// console.log(req.params); // {id: '5', x:'23', y:'45'}
-// !Optional
-// app.get('/api/v1/tours/:id/:x?/:y?', (req, res) => {})
-// console.log(req.params); // {id: '5', x:'23', y:'45'}
-
-app.get('/api/v1/tours/:id/:x?', (req, res) => {
+app.get('/api/v1/tours/:id', (req, res) => {
   if (req.params.id > tours.length) {
     return res.status(404).json({
       status: 'fail',
       message: 'Invalid ID',
     });
   }
-
   res.status(200).json({
     status: 'success',
     data: {
@@ -54,8 +53,8 @@ app.get('/api/v1/tours/:id/:x?', (req, res) => {
 });
 
 app.post('/api/v1/tours', (req, res) => {
-  newId = tours[tours.length - 1].id + 1;
-  newTour = Object.assign({ id: newId }, req.body);
+  const newId = tours[tours.length - 1].id + 1;
+  const newTour = Object.assign({ id: newId }, req.body);
   tours.push(newTour);
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
     res.status(201).json({
