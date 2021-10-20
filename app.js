@@ -30,6 +30,29 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// !Required
+// app.get('/api/v1/tours/:id/:x/:y', (req, res) => {})
+// console.log(req.params); // {id: '5', x:'23', y:'45'}
+// !Optional
+// app.get('/api/v1/tours/:id/:x?/:y?', (req, res) => {})
+// console.log(req.params); // {id: '5', x:'23', y:'45'}
+
+app.get('/api/v1/tours/:id/:x?', (req, res) => {
+  if (req.params.id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: tours[req.params.id],
+    },
+  });
+});
+
 app.post('/api/v1/tours', (req, res) => {
   newId = tours[tours.length - 1].id + 1;
   newTour = Object.assign({ id: newId }, req.body);
