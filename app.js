@@ -3,11 +3,6 @@ const fs = require('fs');
 const app = express();
 app.use(express.json());
 
-const port = 3000;
-app.listen(port, (req, res) => {
-  console.log(`Listening at port ${port}`);
-});
-
 // !Required
 // app.get('/api/v1/tours/:id/:x/:y', (req, res) => {})
 // console.log(req.params); // {id: '5', x:'23', y:'45'}
@@ -92,8 +87,16 @@ const deleteTour = (req, res) => {
   });
 };
 
-app.get('/api/v1/tours', getAllTours);
-app.get('/api/v1/tours/:id', getTour);
-app.post('/api/v1/tours', createTour);
-app.patch('/api/v1/tours/:id', changeTour);
-app.delete('/api/v1/tours/:id', deleteTour);
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', createTour);
+// app.patch('/api/v1/tours/:id', changeTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+app.route('/api/v1/tours/:id').get(getTour).patch(changeTour).delete(deleteTour);
+
+const port = 3000;
+app.listen(port, (req, res) => {
+  console.log(`Listening at port ${port}`);
+});
