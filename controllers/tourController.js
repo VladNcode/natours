@@ -2,6 +2,17 @@ const fs = require('fs');
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`));
 
+exports.checkID = (req, res, next, val) => {
+  console.log(`Your id is ${val}`);
+  if (req.params.id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+  }
+  next();
+};
+
 //* 2) Route handlers
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -15,12 +26,6 @@ exports.getAllTours = (req, res) => {
 };
 
 exports.getTour = (req, res) => {
-  if (req.params.id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -44,13 +49,6 @@ exports.createTour = (req, res) => {
 };
 
 exports.changeTour = (req, res) => {
-  if (req.params.id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   tours[req.params.id] = Object.assign({ id: req.params.id * 1 }, req.body);
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {});
 
@@ -63,13 +61,6 @@ exports.changeTour = (req, res) => {
   });
 };
 exports.deleteTour = (req, res) => {
-  if (req.params.id > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
   tours.splice(req.params.id - 1, 1);
   fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {});
 
