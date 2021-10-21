@@ -5,8 +5,11 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 //* 1) Middlewares
-app.use(morgan('dev')); // GET /api/v1/tours 200 2.154 ms - 8944
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} // GET /api/v1/tours 200 2.154 ms - 8944
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`)); // 3000/public/overview.html === 3000/overview.html
 
 // !Middleware to show current date and time
 app.use((req, res, next) => {
