@@ -1,7 +1,23 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 const app = express();
+
+//* 1) Middlewares
+app.use(morgan('dev')); // GET /api/v1/tours 200 2.154 ms - 8944
 app.use(express.json());
+
+// !Applies to each and every single request because route isn't specified
+// app.use((req, res, next) => {
+//   console.log('Hello from the middleware!');
+//   next();
+// });
+
+// !Middleware to show current date and time
+app.use((req, res, next) => {
+  req.time = new Date().toISOString();
+  next();
+});
 
 // !Required
 // app.get('/api/v1/tours/:id/:x/:y', (req, res) => {})
@@ -12,9 +28,11 @@ app.use(express.json());
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`));
 
+//* 2) Route handlers
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
+    requestedAt: req.time,
     results: tours.length,
     data: {
       tours: tours,
@@ -87,6 +105,25 @@ const deleteTour = (req, res) => {
   });
 };
 
+//! Fake users features
+const getAllUsers = (req, res) => {
+  res.status(500).json({ status: 'error', message: 'This route is not yet defined' });
+};
+const createUser = (req, res) => {
+  res.status(500).json({ status: 'error', message: 'This route is not yet defined' });
+};
+const getUser = (req, res) => {
+  res.status(500).json({ status: 'error', message: 'This route is not yet defined' });
+};
+const updateUser = (req, res) => {
+  res.status(500).json({ status: 'error', message: 'This route is not yet defined' });
+};
+const deleteUser = (req, res) => {
+  res.status(500).json({ status: 'error', message: 'This route is not yet defined' });
+};
+
+//* 3) Routes
+
 // app.get('/api/v1/tours', getAllTours);
 // app.get('/api/v1/tours/:id', getTour);
 // app.post('/api/v1/tours', createTour);
@@ -96,6 +133,10 @@ const deleteTour = (req, res) => {
 app.route('/api/v1/tours').get(getAllTours).post(createTour);
 app.route('/api/v1/tours/:id').get(getTour).patch(changeTour).delete(deleteTour);
 
+app.route('/api/v1/users').get(getAllUsers).post(createUser);
+app.route('/api/v1/users:id').get(getUser).patch(updateUser).delete(deleteUser);
+
+//* 4) Start the server
 const port = 3000;
 app.listen(port, (req, res) => {
   console.log(`Listening at port ${port}`);
