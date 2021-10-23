@@ -3,24 +3,18 @@ const Tour = require('../models/tourModel');
 exports.getAllTours = async (req, res) => {
   try {
     //! Build a query
+    // console.log(req.query);
+
+    // 1) Filtering
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(field => delete queryObj[field]);
 
-    const query = Tour.find(queryObj);
+    // 2) Advanced filtering
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-    // console.log(req.query);
-
-    // const query = Tour.find({
-    //   duration: 5,
-    //   difficulty: 'easy',
-    // });
-
-    // const query = Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
+    const query = Tour.find(JSON.parse(queryStr));
 
     //! Execute a query
     const allTours = await query;
@@ -40,6 +34,7 @@ exports.getAllTours = async (req, res) => {
     });
   }
 };
+
 exports.getTour = async (req, res) => {
   try {
     const tour = await Tour.findById(req.params.id);
@@ -56,6 +51,7 @@ exports.getTour = async (req, res) => {
     });
   }
 };
+
 exports.createTour = async (req, res) => {
   try {
     const tour = await Tour.create(req.body);
@@ -72,6 +68,7 @@ exports.createTour = async (req, res) => {
     });
   }
 };
+
 exports.changeTour = async (req, res) => {
   try {
     const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
@@ -91,6 +88,7 @@ exports.changeTour = async (req, res) => {
     });
   }
 };
+
 exports.deleteTour = async (req, res) => {
   try {
     await Tour.findByIdAndDelete(req.params.id);
