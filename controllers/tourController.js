@@ -1,5 +1,13 @@
 const Tour = require('../models/tourModel');
 
+//! Middleware to prefill top 5
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = '-ratingsAverage,price';
+  req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
     //! Build a query
@@ -50,7 +58,7 @@ exports.getAllTours = async (req, res) => {
     //! Send response
     res.status(200).json({
       status: 'success',
-      count: allTours.length,
+      results: allTours.length,
       data: {
         tours: allTours,
       },
