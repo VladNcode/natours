@@ -136,17 +136,17 @@ exports.getTourStats = async (req, res) => {
   }
 };
 
+// $unwind $match $group $addFields $project $sort $limit
+
 exports.getMonthlyPlan = async (req, res) => {
   try {
-    const year = +req.params.year; // 2021
-    const plan = await Tour.aggregate([
-      { $unwind: { path: '$startDates', preserveNullAndEmptyArrays: true } },
+    const year = +req.params.year;
+    const plan = Tour.aggregate([
+      { $unwind: '$startDates' },
       {
         $match: {
-          startDates: {
-            $gte: new Date(`${year}-01-01`),
-            $lte: new Date(`${year}-12-31`),
-          },
+          $gte: new Date(`${year}-01-01`),
+          $lte: new Date(`${year}-12-31`),
         },
       },
       {
@@ -157,17 +157,13 @@ exports.getMonthlyPlan = async (req, res) => {
         },
       },
       {
-        $addFields: { month: '$_id' },
-      },
-      {
-        $project: {
-          _id: 0,
+        $addFields: {
+          month: '$_id',
         },
       },
+      { $project: { _id: 0 } },
       { $sort: { numTourStarts: -1 } },
-      {
-        $limit: 12,
-      },
+      { $limit: 12 },
     ]);
 
     res.status(200).json({
