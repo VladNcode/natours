@@ -18,8 +18,16 @@ app.use((req, res, next) => {
   next();
 });
 
-//* 3) Routes
+//* 2) Routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+//* If code reaches this point, it will be executed
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Can't find ${req.originalUrl} on this server`,
+  });
+});
 
 module.exports = app;
