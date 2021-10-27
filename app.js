@@ -17,6 +17,9 @@ app.use(express.static(`${__dirname}/public`)); // 3000/public/overview.html ===
 // !Middleware to show current date and time
 app.use((req, res, next) => {
   req.time = new Date().toISOString();
+  // const token = req.headers.authorization.substring(6);
+  // console.log(token);
+  // console.log(req.headers);
   next();
 });
 
