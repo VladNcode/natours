@@ -23,6 +23,7 @@ const usersSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide your password.'],
     maxlength: [8, 'A password must be at least 8 characters'],
+    select: false,
   },
   passwordConfirm: {
     type: String,
@@ -38,10 +39,6 @@ const usersSchema = new mongoose.Schema({
 });
 
 // Password encryption
-// usersSchema.pre('save', function (next) {
-//   if (!this.isModified('password')) return next();
-// });
-
 usersSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
@@ -54,8 +51,9 @@ usersSchema.pre('save', async function (next) {
   }
 });
 
-usersSchema.methods.validatePassword = async function validatePassword(data) {
-  return bcrypt.compare(data, this.password);
+// Pass validation
+usersSchema.methods.validatePassword = async function (candidatePassword, userPassword) {
+  return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 const User = mongoose.model('User', usersSchema);
