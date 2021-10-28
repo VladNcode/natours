@@ -28,7 +28,7 @@ const usersSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Please provide your password.'],
-    maxlength: [8, 'A password must be at least 8 characters'],
+    minlength: [8, 'A password must be at least 8 characters'],
     select: false,
   },
   passwordConfirm: {
@@ -58,6 +58,15 @@ usersSchema.pre('save', async function (next) {
   } catch (err) {
     return next(err);
   }
+});
+
+usersSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
 });
 
 // Pass validation
