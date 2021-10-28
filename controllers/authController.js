@@ -12,6 +12,25 @@ const signToken = id =>
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
+const createSendToken = (user, statusCode, res, data) => {
+  const token = signToken(user._id);
+
+  if (data) {
+    res.status(statusCode).json({
+      status: 'success',
+      token,
+      data: {
+        user,
+      },
+    });
+  }
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+  });
+};
+
 exports.signup = catchAsync(async (req, res, next) => {
   // 1) create a newUser from body data
   const newUser = await User.create({
@@ -21,18 +40,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: req.body.passwordChangedAt,
   });
-
-  // 2) create signed token
-  const token = signToken(newUser._id);
-
-  // 3) send response
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createSendToken(newUser, 201, res, true);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -49,11 +57,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) If everything is ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -186,36 +190,27 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // user.passwordChangedAt = Date.now();
 
   // 4) Log the user in, send JWT
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from Collection
-  const user = await User.findOne({ email: req.body.email }).select(
-    '+password'
-  );
+  const user = await User.findById(req.user.id).select('+password');
 
   // 2) Check if posted password is correct
   if (
     !user ||
     !(await user.validatePassword(req.body.password, user.password))
   ) {
-    return next(new AppError('Please enter correct email and password', 401));
+    return next(
+      new AppError('Email or password is incorrect, please try again', 401)
+    );
   }
-
-  // 3) If so, update the password
+  // 3) If so, update the
   user.password = req.body.newPassword;
   user.passwordConfirm = req.body.newPasswordConfirm;
   await user.save();
 
   // 4) Log the user in, send JWT
-  const token = signToken(user._id);
-  res.status(201).json({
-    status: 'success',
-    token,
-  });
+  createSendToken(user, 200, res);
 });
