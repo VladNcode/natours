@@ -19,6 +19,11 @@ const usersSchema = new mongoose.Schema({
   photo: {
     type: String,
   },
+  role: {
+    type: String,
+    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    default: 'user',
+  },
   password: {
     type: String,
     required: [true, 'Please provide your password.'],
@@ -53,14 +58,20 @@ usersSchema.pre('save', async function (next) {
 });
 
 // Pass validation
-usersSchema.methods.validatePassword = async function (candidatePassword, userPassword) {
+usersSchema.methods.validatePassword = async function (
+  candidatePassword,
+  userPassword
+) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
 // user pass changed?
 usersSchema.methods.changedPasswordAfter = function (JTWTimeStamp) {
   if (this.passwordChangedAt) {
-    const changedTimeStamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
     return JTWTimeStamp < changedTimeStamp; // 100 < 200 = true
   }
 
