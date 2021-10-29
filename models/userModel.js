@@ -45,6 +45,11 @@ const usersSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 // Password encryption
@@ -66,6 +71,12 @@ usersSchema.pre('save', function (next) {
   }
 
   this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+usersSchema.pre(/^find/, function (next) {
+  // this poinst to the current query
+  this.find({ active: { $ne: false } });
   next();
 });
 
