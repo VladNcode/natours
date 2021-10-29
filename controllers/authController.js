@@ -58,9 +58,27 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please enter email and password', 400));
   }
 
-  // 2) Check if user exists and password is valid
+  // 2) Find user
   const user = await User.findOne({ email }).select('+password');
+
+  // Check if user is locked
+  if (!user || user.isLocked) {
+    user.incrementLoginAttempts();
+    return next(
+      new AppError(
+        'You have exceeded the maximum number of login attempts. Try again in 1 hour',
+        400
+      )
+    );
+  }
+
+  // 2) Check if user exists and password is valid
   if (!user || !(await user.validatePassword(password, user.password))) {
+    user.incrementLoginAttempts(err => {
+      if (err) {
+        return err;
+      }
+    });
     return next(new AppError('Please enter correct email and password', 401));
   }
 

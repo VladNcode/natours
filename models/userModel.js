@@ -4,6 +4,8 @@ const validator = require('validator');
 const bcrypt = require('bcrypt');
 
 const SALT_WORK_FACTOR = 12;
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCK_TIME = 1 * 60 * 60 * 1000;
 
 const usersSchema = new mongoose.Schema({
   name: {
@@ -50,6 +52,12 @@ const usersSchema = new mongoose.Schema({
     default: true,
     select: false,
   },
+  loginAttempts: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  lockUntil: Number,
 });
 
 // Password encryption
@@ -79,6 +87,41 @@ usersSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
   next();
 });
+
+//! Maximum login attempts
+usersSchema.virtual('isLocked').get(function () {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+usersSchema.methods.incrementLoginAttempts = function (callback) {
+  console.log('lock until', this.lockUntil);
+  // if we have a previous lock that has expired, restart at 1
+  const lockExpired = !!(this.lockUntil && this.lockUntil < Date.now());
+  console.log('lockExpired', lockExpired);
+  if (lockExpired) {
+    return this.update(
+      {
+        $set: { loginAttempts: 1 },
+        $unset: { lockUntil: 1 },
+      },
+      callback
+    );
+  }
+  // otherwise we're incrementing
+  const updates = { $inc: { loginAttempts: 1 } };
+  // lock the account if we've reached max attempts and it's not locked already
+  const needToLock = !!(
+    this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked
+  );
+  console.log('needToLock', needToLock);
+  console.log('loginAttempts', this.loginAttempts);
+  if (needToLock) {
+    updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+    console.log('LOCK_TIME', Date.now() + LOCK_TIME);
+  }
+  //console.log("lockUntil",this.lockUntil)
+  return this.update(updates, callback);
+};
 
 // Pass validation
 usersSchema.methods.validatePassword = async function (
