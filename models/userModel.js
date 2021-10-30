@@ -56,6 +56,7 @@ const usersSchema = new mongoose.Schema({
     type: Number,
     required: true,
     default: 0,
+    select: false,
   },
   lockUntil: Number,
 });

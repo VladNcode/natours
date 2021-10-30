@@ -28,6 +28,9 @@ const createSendToken = (user, statusCode, res) => {
   user.password = undefined;
   user.active = undefined;
   user.role = undefined;
+  user.loginAttempts = undefined;
+  user.lockUntil = undefined;
+  user.passwordChangedAt = undefined;
   user.__v = undefined;
 
   res.status(statusCode).json({
