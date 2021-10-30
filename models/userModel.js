@@ -7,59 +7,65 @@ const SALT_WORK_FACTOR = 12;
 const MAX_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME = 1 * 60 * 60 * 1000;
 
-const usersSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please tell us your name.'],
-  },
-  email: {
-    type: String,
-    required: [true, 'Please provide your email address.'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email address'],
-  },
-  photo: {
-    type: String,
-  },
-  role: {
-    type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
-    default: 'user',
-  },
-  password: {
-    type: String,
-    required: [true, 'Please provide your password.'],
-    minlength: [8, 'A password must be at least 8 characters'],
-    select: false,
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, 'Please confirm your password.'],
-    validate: {
-      // This only works on CREATE AND SAVE!!!
-      validator: function (val) {
-        return val === this.password; // if false = validation error
-      },
-      message: "Passwords doesn't match",
+const usersSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Please tell us your name.'],
     },
+    email: {
+      type: String,
+      required: [true, 'Please provide your email address.'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email address'],
+    },
+    photo: {
+      type: String,
+    },
+    role: {
+      type: String,
+      enum: ['user', 'guide', 'lead-guide', 'admin'],
+      default: 'user',
+    },
+    password: {
+      type: String,
+      required: [true, 'Please provide your password.'],
+      minlength: [8, 'A password must be at least 8 characters'],
+      select: false,
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'Please confirm your password.'],
+      validate: {
+        // This only works on CREATE AND SAVE!!!
+        validator: function (val) {
+          return val === this.password; // if false = validation error
+        },
+        message: "Passwords doesn't match",
+      },
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
+    loginAttempts: {
+      type: Number,
+      required: true,
+      default: 0,
+      select: false,
+    },
+    lockUntil: Number,
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    select: false,
-  },
-  loginAttempts: {
-    type: Number,
-    required: true,
-    default: 0,
-    select: false,
-  },
-  lockUntil: Number,
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 // Password encryption
 usersSchema.pre('save', async function (next) {
