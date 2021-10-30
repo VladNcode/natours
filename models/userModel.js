@@ -90,37 +90,30 @@ usersSchema.pre(/^find/, function (next) {
 
 //! Maximum login attempts
 usersSchema.virtual('isLocked').get(function () {
-  return !!(this.lockUntil && this.lockUntil > Date.now());
+  return this.lockUntil && this.lockUntil > Date.now();
 });
 
-usersSchema.methods.incrementLoginAttempts = function (callback) {
-  console.log('lock until', this.lockUntil);
-  // if we have a previous lock that has expired, restart at 1
-  const lockExpired = !!(this.lockUntil && this.lockUntil < Date.now());
-  console.log('lockExpired', lockExpired);
-  if (lockExpired) {
-    return this.update(
-      {
+usersSchema.methods.incrementLoginAttempts = async function () {
+  try {
+    // 1) Check if lock has expired
+    if (this.lockUntil && this.lockUntil < Date.now()) {
+      return await this.updateOne({
         $set: { loginAttempts: 1 },
         $unset: { lockUntil: 1 },
-      },
-      callback
-    );
+      });
+    }
+
+    // 2) Otherwise we're incrementing
+    const updates = { $inc: { loginAttempts: 1 } };
+
+    // 3) Lock the account if we've reached max attempts and it's not locked already
+    if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
+      updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+    }
+    return await this.updateOne(updates);
+  } catch (err) {
+    console.log(err);
   }
-  // otherwise we're incrementing
-  const updates = { $inc: { loginAttempts: 1 } };
-  // lock the account if we've reached max attempts and it's not locked already
-  const needToLock = !!(
-    this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked
-  );
-  console.log('needToLock', needToLock);
-  console.log('loginAttempts', this.loginAttempts);
-  if (needToLock) {
-    updates.$set = { lockUntil: Date.now() + LOCK_TIME };
-    console.log('LOCK_TIME', Date.now() + LOCK_TIME);
-  }
-  //console.log("lockUntil",this.lockUntil)
-  return this.update(updates, callback);
 };
 
 // Pass validation

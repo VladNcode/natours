@@ -60,10 +60,11 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 2) Find user
   const user = await User.findOne({ email }).select('+password');
+  if (!user)
+    return next(new AppError('Please enter correct email and password', 401));
 
-  // Check if user is locked
-  if (!user || user.isLocked) {
-    user.incrementLoginAttempts();
+  // 3) Check if user is locked
+  if (user.isLocked) {
     return next(
       new AppError(
         'You have exceeded the maximum number of login attempts. Try again in 1 hour',
@@ -72,17 +73,13 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
-  // 2) Check if user exists and password is valid
-  if (!user || !(await user.validatePassword(password, user.password))) {
-    user.incrementLoginAttempts(err => {
-      if (err) {
-        return err;
-      }
-    });
+  // 4) Check if password is valid, if not inc log attempts
+  if (!(await user.validatePassword(password, user.password))) {
+    user.incrementLoginAttempts();
     return next(new AppError('Please enter correct email and password', 401));
   }
 
-  // 3) If everything is ok, send token to client
+  // 5) If everything is ok, send token to client
   createSendToken(user, 200, res);
 });
 

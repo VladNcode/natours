@@ -16,7 +16,11 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   // console.log(req.query);
 
   //! Execute a query
-  const features = new APIFeatures(Tour.find(), req.query).filter().sort().limitFields().paginate();
+  const features = new APIFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
   const allTours = await features.query;
 
   //! Send response
