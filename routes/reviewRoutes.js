@@ -6,13 +6,17 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(authController.protect, reviewController.getAllReviews)
-  .post(reviewController.createReview);
+  .get(reviewController.getAllReviews)
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.createReview
+  );
 
 router
   .route('/:id')
   .get(reviewController.getReview)
-  .patch(reviewController.changeReview)
+  .patch(authController.protect, reviewController.changeReview)
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

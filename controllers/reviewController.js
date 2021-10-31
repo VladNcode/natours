@@ -11,7 +11,6 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
     .paginate();
   const allReviews = await features.query;
 
-  //! Send response
   res.status(200).json({
     status: 'success',
     results: allReviews.length,
@@ -37,7 +36,13 @@ exports.getReview = catchAsync(async (req, res, next) => {
 });
 
 exports.createReview = catchAsync(async (req, res, next) => {
-  const review = await Review.create(req.body);
+  const review = await Review.create({
+    review: req.body.review,
+    rating: req.body.rating,
+    tour: req.body.tour,
+    user: req.user.id,
+  });
+
   res.status(201).json({
     status: 'success',
     data: {
