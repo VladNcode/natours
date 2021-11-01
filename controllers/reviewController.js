@@ -32,49 +32,12 @@ exports.getReview = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.createReview = catchAsync(async (req, res, next) => {
-  // Allow nested routes
+exports.setTourUserIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
-  const review = await Review.create(req.body);
+  next();
+};
 
-  res.status(201).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
-
-exports.changeReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!review) {
-    return next(new AppError('No review found with that ID', 404));
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
-
-// exports.deleteReview = catchAsync(async (req, res, next) => {
-//   const review = await Review.findByIdAndDelete(req.params.id);
-
-//   if (!review) {
-//     return next(new AppError('No Review found with that ID', 404));
-//   }
-
-//   res.status(204).json({
-//     status: 'success',
-//     data: null,
-//   });
-// });
-
+exports.createReview = factory.createOne(Review);
+exports.changeReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
