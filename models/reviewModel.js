@@ -35,6 +35,9 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+//! Prevent duplicate reviews
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
   //   path: 'tour',
@@ -83,6 +86,10 @@ reviewSchema.post('save', function () {
   this.constructor.calcAverageRatings(this.tour);
 });
 
+reviewSchema.post(/^findOneAnd/, async doc => {
+  await doc.constructor.calcAverageRatings(doc.tour);
+});
+
 // findByIdAndUpdate;
 // findByIdAndDelete;
 // reviewSchema.pre(/^findOneAnd/, async function (next) {
@@ -95,10 +102,6 @@ reviewSchema.post('save', function () {
 //   // await this.findOne(); does NOT work here, query has already been executed
 //   await this.r.constructor.calcAverageRatings(this.r.tour);
 // });
-
-reviewSchema.post(/^findOneAnd/, async doc => {
-  await doc.constructor.calcAverageRatings(doc.tour);
-});
 
 const Review = mongoose.model('Review', reviewSchema);
 module.exports = Review;
