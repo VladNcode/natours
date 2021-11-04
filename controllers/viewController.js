@@ -18,23 +18,14 @@ exports.getTour = catchAsync(async (req, res, next) => {
     path: 'reviews',
     fields: 'review rating user',
   });
-  res
-    .status(200)
-    .set(
-      'Content-Security-Policy',
-      'connect-src https://*.tiles.mapbox.com https://api.mapbox.com https://events.mapbox.com'
-    )
-    .render('tour', {
-      title: tour.name,
-      tour,
-    });
+  res.status(200).render('tour', {
+    title: tour.name,
+    tour,
+  });
 });
 
 exports.getLoginForm = (req, res) => {
-  res
-    .status(200)
-    .set('Content-Security-Policy', "connect-src 'self' http://127.0.0.1:3000/")
-    .render('login', {
-      title: 'Login page',
-    });
+  res.status(200).render('login', {
+    title: 'Login page',
+  });
 };
