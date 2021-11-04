@@ -1,5 +1,5 @@
 const Tour = require('../models/tourModel');
-const User = require('../models/userModel');
+// const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getOverview = catchAsync(async (req, res, next) => {
@@ -31,7 +31,10 @@ exports.getTour = catchAsync(async (req, res, next) => {
 });
 
 exports.getLoginForm = (req, res) => {
-  res.status(200).render('login', {
-    title: 'Login page',
-  });
+  res
+    .status(200)
+    .set('Content-Security-Policy', "connect-src 'self' http://127.0.0.1:3000/")
+    .render('login', {
+      title: 'Login page',
+    });
 };

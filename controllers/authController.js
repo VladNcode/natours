@@ -94,6 +94,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.substring(7);
+  } else if (req.cookies.jwt) {
+    // cookie-parser npm package
+    token = req.cookies.jwt;
   }
 
   if (!token) {
