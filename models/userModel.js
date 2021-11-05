@@ -117,6 +117,9 @@ usersSchema.methods.incrementLoginAttempts = async function () {
     if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
       updates.$set = { lockUntil: Date.now() + LOCK_TIME };
     }
+    // console.log(this);
+    // console.log(this.loginAttempts);
+    // console.log(this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS);
     return await this.updateOne(updates);
   } catch (err) {
     console.log(err);
