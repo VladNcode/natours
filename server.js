@@ -35,6 +35,7 @@ mongoose
 const port = process.env.PORT || 3000;
 const server = app.listen(port, (req, res) => {
   console.log(`Listening at port ${port}`);
+  console.log(`Currently in: ${process.env.NODE_ENV}`);
 });
 
 process.on('unhandledRejection', err => {
