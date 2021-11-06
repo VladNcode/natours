@@ -22,6 +22,7 @@ const usersSchema = new mongoose.Schema(
     },
     photo: {
       type: String,
+      default: 'default.jpg',
     },
     role: {
       type: String,
@@ -59,6 +60,12 @@ const usersSchema = new mongoose.Schema(
       default: 0,
       select: false,
     },
+    // lastLoginAttempt: {
+    //   type: Number,
+    //   required: true,
+    //   default: 0,
+    //   select: false,
+    // },
     lockUntil: Number,
   },
   {
@@ -111,15 +118,15 @@ usersSchema.methods.incrementLoginAttempts = async function () {
     }
 
     // 2) Otherwise we're incrementing
-    const updates = { $inc: { loginAttempts: 1 } };
+    const updates = {
+      $inc: { loginAttempts: 1 },
+    };
 
     // 3) Lock the account if we've reached max attempts and it's not locked already
     if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
       updates.$set = { lockUntil: Date.now() + LOCK_TIME };
     }
-    // console.log(this);
-    // console.log(this.loginAttempts);
-    // console.log(this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS);
+
     return await this.updateOne(updates);
   } catch (err) {
     console.log(err);

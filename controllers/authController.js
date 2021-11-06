@@ -84,7 +84,8 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Please enter correct email and password', 401));
   }
 
-  // 5) If everything is ok, send token to client
+  // 5) If everything is ok, send token to client and reset login attempts
+  await User.findByIdAndUpdate(user.id, { loginAttempts: 0 });
   createSendToken(user, 200, res);
 });
 
