@@ -1,6 +1,6 @@
 const Stripe = require('stripe');
 const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 const factory = require('./handlerFactory');
@@ -53,3 +53,9 @@ exports.createBookingCheckout = async function (req, res, next) {
 
   next();
 };
+
+exports.getAllBookings = factory.getAll(Booking);
+exports.getBooking = factory.getOne(Booking);
+exports.createBooking = factory.createOne(Booking);
+exports.changeBooking = factory.updateOne(Booking);
+exports.deleteBooking = factory.deleteOne(Booking);
