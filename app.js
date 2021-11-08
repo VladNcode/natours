@@ -24,15 +24,19 @@ app.enable('trust proxy');
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use(
-  cors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, //access-control-allow-credentials:true
-    optionSuccessStatus: 200,
-  })
-);
+// app.use(
+//   cors({
+//     origin: 'http://localhost:3000',
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true, //access-control-allow-credentials:true
+//     optionSuccessStatus: 200,
+//   })
+// );
+
+app.use(cors());
+
+app.options('*', cors({}));
 
 //! 1) Global Middlewares
 //* Serving static files
