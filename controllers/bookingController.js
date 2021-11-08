@@ -67,7 +67,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
   const signature = req.headers['stripe-signature'];
   let event;
   try {
-    event = Stripe.webhooks.construceEvent(
+    event = Stripe.webhooks.constructEvent(
       req.body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
