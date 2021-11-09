@@ -10,6 +10,27 @@ html
       title Natours | #{title}
 
   body(data-alert=`${alert ? alert : ''}`)
+    .modal.hiddenModal
+      button.close-modal &times;
+      .signup-form
+        h2.heading-secondary.ma-bt-lg Sign up for free!
+        form.form.form--signup
+          .form__group
+            label.form__label(for='name') Your name
+            input#nameSignup.form__input(type='name', placeholder='Your name', required)
+          .form__group
+            label.form__label(for='email') Email address
+            input#emailSignup.form__input(type='email', placeholder='you@example.com', required)
+          .form__group.ma-bt-md
+            label.form__label(for='password') Password
+            input#passwordSignup.form__input(type='password', placeholder='••••••••', required, minlength='8')
+          .form__group.ma-bt-md
+            label.form__label(for='password') Password confirm
+            input#passwordConfirmSignup.form__input(type='passwordConfirm', placeholder='••••••••', required, minlength='8')
+          .form__group
+            button.btn.btn--green Sign up!
+    .overlay.hiddenModal
+
     // HEADER
     include _header
 

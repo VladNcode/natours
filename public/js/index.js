@@ -5,10 +5,13 @@ import { login, logout } from './login';
 import { updateSettings } from './updateSettings';
 import { bookTour } from './stripe';
 import { showAlert } from './alerts';
+import { modal } from './modal';
+import { signup } from './signup';
 
 // DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
+const signupForm = document.querySelector('.form--signup');
 const logOutBtn = document.querySelector('.nav__el--logout');
 const updateForm = document.querySelector('.form-user-data');
 const updatePassForm = document.querySelector('.form-user-settings');
@@ -19,6 +22,18 @@ if (mapBox) {
   const locations = JSON.parse(mapBox.dataset.locations);
   displayMap(locations);
 }
+
+if (signupForm)
+  signupForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('nameSignup').value;
+    const email = document.getElementById('emailSignup').value;
+    const password = document.getElementById('passwordSignup').value;
+    const passwordConfirm = document.getElementById(
+      'passwordConfirmSignup'
+    ).value;
+    signup(name, email, password, passwordConfirm);
+  });
 
 if (loginForm)
   loginForm.addEventListener('submit', e => {
