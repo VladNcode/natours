@@ -161,6 +161,10 @@ toursSchema.pre(/^find/, function (next) {
   next();
 });
 
+toursSchema.post('findOneAndUpdate', doc => {
+  doc.save();
+});
+
 // toursSchema.post(/^find/, function (docs, next) {
 //   console.log(`Query took ${Date.now() - this.start} milliseconds`);
 //   next();
