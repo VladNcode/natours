@@ -6,5 +6,11 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(authController.protect, contactController.getAllContacts)
+  .get(
+    authController.protect,
+    authController.restrictTo('admin'),
+    contactController.getAllContacts
+  )
   .post(contactController.createContact);
+
+module.exports = router;
