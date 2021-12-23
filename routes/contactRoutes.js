@@ -6,4 +6,5 @@ const router = express.Router();
 
 router
   .route('/')
-  .post(authController.protect, contactController.getAllContacts);
+  .get(authController.protect, contactController.getAllContacts)
+  .post(contactController.createContact);
