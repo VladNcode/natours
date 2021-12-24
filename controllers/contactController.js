@@ -24,6 +24,17 @@ exports.createContact = catchAsync(async (req, res, next) => {
     html: JSON.stringify(doc), // html body
   });
 
+  transporter.sendMail({
+    from: `Vladyslav Nikiforov <${process.env.EMAIL_FROM}>`, // sender address
+    to: `${doc.email}`, // list of receivers
+    subject: 'Your contact was successfully submited', // Subject line
+    text: 'I will get back to you ASAP', // plain text body
+    html: `<h1>Hello ${doc.name}!</h2>
+    <h2>Thanks for contacting me!<h2>
+    <p>I will get to you ASAP :)</p>
+    `, // html body
+  });
+
   res.status(201).json({
     status: 'success',
     data: {
