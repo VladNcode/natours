@@ -1,5 +1,8 @@
 # Natours
+![natours-small](https://user-images.githubusercontent.com/91598576/148011759-e6a0ec52-2fc1-46d0-a7f5-18bfcb225045.jpg)
+
 A tour booking web app written in NodeJS, Express, MongoDB
+
 
 # Key Features:
 - Authentication and Authorization
